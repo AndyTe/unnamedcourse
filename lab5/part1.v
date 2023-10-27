@@ -1,83 +1,43 @@
-module part1 (input Clock, input Enable, input Reset, output [7:0] CounterValue);
-
-    wire t0, t1, t2, t3, t4, t5, t6, t7;
-    reg [7:0] counters;
-    
-    assign t0 = Enable;
-
-    TFlipFlop tff0 (
-        .T(t0),
-        .Clock(Clock),
-        .Reset(Reset),
-        .q(counters[0])
-    );
-
-    assign t1 = Enable & counters[0];
-    
-    TFlipFlop tff1 (
-        .T(t1),
-        .Clock(Clock),
-        .Reset(Reset),
-        .q(counters[1])
-    );
-    
-    TFlipFlop tff2 (
-        .T(t2),
-        .Clock(Clock),
-        .Reset(Reset),
-        .q(counters[2])
-    );
-    
-    TFlipFlop tff3 (
-        .T(t3),
-        .Clock(Clock),
-        .Reset(Reset),
-        .q(counters[3])
-    );
-    
-    TFlipFlop tff4 (
-        .T(t4),
-        .Clock(Clock),
-        .Reset(Reset),
-        .q(counters[4])
-    );
-    
-    TFlipFlop tff5 (
-        .T(t5),
-        .Clock(Clock),
-        .Reset(Reset),
-        .q(counters[5])
-    );
-    
-    TFlipFlop tff6 (
-        .T(t6),
-        .Clock(Clock),
-        .Reset(Reset),
-        .q(counters[6])
-    );
-    
-    TFlipFlop tff7 (
-        .T(t7),
-        .Clock(Clock),
-        .Reset(Reset),
-        .q(counters[7])
-    );
-    
-    assign CounterValue = counters;
-    
+module part1 (
+	input Clock,
+	input Enable,
+	input Reset,
+	output [7:0] CounterValue
+);
+	wire [6:0] q;
+	assign q[0] = Enable & CounterValue[0];
+	
+	Tflip u1 (.Clock(Clock), .Enable(Enable), .Reset(Reset), .CounterValue(CounterValue[0]));
+	
+	Tflip u2 (.Clock(Clock), .Enable(q[0]), .Reset(Reset), .CounterValue(CounterValue[1]));
+	
+	Tflip u3 (.Clock(Clock), .Enable(q[1]), .Reset(Reset), .CounterValue(CounterValue[2]));
+	
+	Tflip u4 (.Clock(Clock), .Enable(q[2]), .Reset(Reset), .CounterValue(CounterValue[3]));
+	
+	Tflip u5 (.Clock(Clock), .Enable(q[3]), .Reset(Reset), .CounterValue(CounterValue[4]));
+	
+	Tflip u6 (.Clock(Clock), .Enable(q[4]), .Reset(Reset), .CounterValue(CounterValue[5]));
+	
+	Tflip u7 (.Clock(Clock), .Enable(q[5]), .Reset(Reset), .CounterValue(CounterValue[6]));
+		
+	Tflip u8 (.Clock(Clock), .Enable(q[6]), .Reset(Reset), .CounterValue(CounterValue[7]));	
 endmodule
 
-module TFlipFlop (
-    input wire T,
-    input wire Clock,
-    input wire Reset,
-    output reg q
+module Tflip (
+	input Clock,
+	input Enable,
+	input Reset,
+	output reg CounterValue
 );
-    always @(posedge Clock)
-        begin
-        if (!Reset)
-            q <= 0;
-        else if (T)
-            q <= ~q;
-        end
+	
+	always @(posedge Clock, negedge Reset) begin
+		if (Reset) begin
+			CounterValue <= 1'b0;
+		end
+		
+		else begin
+			CounterValue <= CounterValue ^ Enable;
+		end
+	end
 endmodule
